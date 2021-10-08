@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <cassert>
 #include <iostream>
 #include "strutil.hpp"
 
@@ -59,7 +60,6 @@ void Parser::ModelParser::ParseModel()
 
 std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(const std::string& str)
 {
-    // m_tokens
     size_t tok_index = 0;
     out_type type = m_tokens[tok_index].type;
     std::unordered_map<std::string, std::string> map;
@@ -99,6 +99,8 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(co
 
 std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, const std::string& data)
 {
+    assert(!m_parsed || !newfmt.m_parsed);
+
     auto map = ExtractData(data);
     std::string str;
     for (const auto& token : newfmt.m_tokens) {
