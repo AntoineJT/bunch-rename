@@ -1,45 +1,62 @@
 #include <iostream>
 #include <filesystem>
+#include <functional>
+#include <optional>
 #include <tclap/CmdLine.h>
 
-template<bool filesOnly>
-auto GetEntries(const std::string_view path)
-    -> std::vector<std::filesystem::directory_entry>
+auto GetEntries(const std::string_view path,
+    const std::function<bool(std::filesystem::directory_entry)>& filter)
+-> std::vector<std::filesystem::directory_entry>
 {
     namespace fs = std::filesystem;
 
     std::vector<fs::directory_entry> entries;
-    if constexpr (filesOnly) {
-        for (const auto& entry : fs::directory_iterator(path)) {
-            if (entry.is_regular_file()) {
-                entries.push_back(entry);
-            }
-        }
-    }
-    else {
-        for (const auto& entry : fs::directory_iterator(path)) {
+    for (const auto& entry : fs::directory_iterator(path)) {
+        if (filter(entry)) {
             entries.push_back(entry);
         }
     }
     return entries;
 }
 
-void PrintFiles(const std::string_view path)
+bool EndsWith(const std::string& str, const std::string& endstr)
 {
-    for (const auto& entry : GetEntries<true>(path)) {
-        std::cout << entry.path().filename() << '\n';
+    const size_t count = endstr.length();
+    const size_t start = str.length() - count;
+
+    for (size_t i = count - 1; i > 0; --i) {
+        if (str[start + i] != endstr[i]) {
+            return false;
+        }
     }
+    return true;
 }
+
+// can't find a way to do it with templates
+// as TCLAP::Arg type does not have getValue
+#define OPT_ARG(x) x.isSet() ? std::optional(x.getValue()) : std::nullopt
 
 int main(const int argc, const char* argv[])
 {
     TCLAP::CmdLine cmd("Bunch Rename Tool");
     TCLAP::UnlabeledValueArg<std::string> srcdirArg("srcdir", "Source Directory containing files", true, ".", "string");
     TCLAP::ValueArg<std::string> extArg("", "ext", "Keep only files with the specified extension", false, "", "string");
-    cmd.add(srcdirArg);
-    cmd.add(extArg);
+    TCLAP::SwitchArg dryrunArg("", "dry-run", "List selected files only");
+    cmd.add(srcdirArg).add(extArg).add(dryrunArg);
     cmd.parse(argc, argv);
 
     const std::string srcdir = srcdirArg.getValue();
-    PrintFiles(srcdir);
+    const auto ext = OPT_ARG(extArg);
+    const bool dryrun = dryrunArg.getValue();
+
+    const auto filter = [ext](const std::filesystem::directory_entry& entry) {
+        if (ext && !EndsWith(entry.path().filename().string(), ext.value()))
+            return false;
+        return entry.is_regular_file();
+    };
+    if (dryrun) {
+        for (const auto& entry : GetEntries(srcdir, filter)) {
+            std::cout << entry.path().filename() << '\n';
+        }
+    }
 }
