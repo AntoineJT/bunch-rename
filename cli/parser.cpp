@@ -17,9 +17,9 @@ void Parser::ModelParser::ParseModel()
         if (c == '{') {
             if (state == PARSE_ID) {
                 throw "error: invalid format"s;
-            } 
+            }
             else if (state == PARSE_TEXT) {
-                m_tokens.emplace_back(out_type::TEXT, std::move(buffer));
+                m_tokens.push_back(out_elem{out_type::TEXT, std::move(buffer)});
                 buffer = "";
                 state = PARSE_ID;
             }
@@ -32,9 +32,12 @@ void Parser::ModelParser::ParseModel()
                 throw "error: invalid format"s;
             }
             else if (state == PARSE_ID) {
-                m_tokens.emplace_back(out_type::VAR, std::move(buffer));
+                m_tokens.push_back(out_elem{out_type::VAR, std::move(buffer)});
                 buffer = "";
                 state = PARSE_TEXT;
+            }
+            else {
+                throw "error: unknown parsing state"s;
             }
         }
         else {

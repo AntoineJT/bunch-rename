@@ -1,0 +1,1 @@
+"C:\Users\AntoineJT\Music\Albums\Linkin Park\Minutes To Midnight" "{num} - {song}" "Linkin Park - Minutes to Midnight - {num}. {song}" --dry-run --ext mp3

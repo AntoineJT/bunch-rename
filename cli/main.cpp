@@ -42,7 +42,7 @@ int main(const int argc, const char* argv[])
 {
     TCLAP::CmdLine cmd("Bunch Rename Tool");
     TCLAP::UnlabeledValueArg<std::string> srcdirArg("srcdir", "Source Directory containing files", true, ".", "string");
-    TCLAP::ValueArg<std::string> curfmtArg("", "curfmt", R"(Current file name format
+    TCLAP::UnlabeledValueArg<std::string> curfmtArg("curfmt", R"(Current file name format
         Example: curfmt = "{num} - {name}"
                  newfmt = "Song Artist - Album - {num}. {name}"
             for
@@ -50,7 +50,7 @@ int main(const int argc, const char* argv[])
             will result in
                 "Song Artist - Album - 11. In Pieces"
 )", true, "", "string");
-    TCLAP::ValueArg<std::string> newfmtArg("", "newfmt", "New file name format\nFor an example, see curfmt help.", true, "", "string");
+    TCLAP::UnlabeledValueArg<std::string> newfmtArg("newfmt", "New file name format\nFor an example, see curfmt help.", true, "", "string");
     TCLAP::ValueArg<std::string> extArg("", "ext", "Keep only files with the specified extension", false, "", "string");
     TCLAP::SwitchArg dryrunArg("", "dry-run", "List selected files only");
     cmd.add(srcdirArg).add(curfmtArg).add(newfmtArg)
