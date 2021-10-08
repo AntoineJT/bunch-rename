@@ -52,40 +52,60 @@ int main(const int argc, const char* argv[])
 )", true, "", "string");
     TCLAP::UnlabeledValueArg<std::string> newfmtArg("newfmt", "New file name format\nFor an example, see curfmt help.", true, "", "string");
     TCLAP::ValueArg<std::string> extArg("", "ext", "Keep only files with the specified extension", false, "", "string");
-    TCLAP::SwitchArg dryrunArg("", "dry-run", "List selected files only");
+    TCLAP::SwitchArg confirmArg("", "y", "Don't prompt for confirmation");
     cmd.add(srcdirArg).add(curfmtArg).add(newfmtArg)
-        .add(extArg).add(dryrunArg);
+        .add(extArg).add(confirmArg);
     cmd.parse(argc, argv);
 
     const std::string& srcdir = srcdirArg.getValue();
     const std::string& curfmt = curfmtArg.getValue();
     const std::string& newfmt = newfmtArg.getValue();
     const auto ext = OPT_ARG(extArg);
-    const bool dryrun = dryrunArg.getValue();
+    const bool confirm = confirmArg.getValue();
 
     const auto filter = [ext](const std::filesystem::directory_entry& entry) {
         if (ext && !EndsWith(entry.path().filename().string(), ext.value()))
             return false;
         return entry.is_regular_file();
     };
-    auto files = GetEntries(srcdir, filter);
-
-    if (dryrun) {
-        for (const auto& file : files) {
-            std::cout << file.path().filename() << '\n';
-        }
-    }
 
     auto oldFormatParser = Parser::ModelParser(curfmt);
     oldFormatParser.ParseModel();
     auto newFormatParser = Parser::ModelParser(newfmt);
     newFormatParser.ParseModel();
 
+    const auto files = GetEntries(srcdir, filter);
+    std::unordered_map<std::string, std::string> new_filenames;
+
     for (const auto& file : files) {
         std::string filename = file.path().filename().string();
-        std::string ext = filename.substr(filename.find_last_of('.'));
-        std::string filenameNoExt = filename.substr(0, filename.length() - ext.length());
-        const std::string newname = oldFormatParser.ConvertTo(newFormatParser, filenameNoExt) + ext;
-        std::cout << newname << '\n';
+        std::string fileext = filename.substr(filename.find_last_of('.'));
+        std::string filenameNoExt = filename.substr(0, filename.length() - fileext.length());
+
+        std::string newname = oldFormatParser.ConvertTo(newFormatParser, filenameNoExt) + fileext;
+        std::cout << filename << "\n> " << newname << '\n';
+        new_filenames.try_emplace(std::move(filename), std::move(newname));
+    }
+    std::cout << std::flush;
+
+    if (!confirm) {
+        std::cout << "Are you sure to rename all those files? [Y/N] ";
+        char c;
+        std::cin >> c;
+        if (c != 'y' && c != 'Y') {
+            exit(EXIT_SUCCESS);
+        }
+    }
+
+    for (const auto& file : files) {
+        const auto& path = file.path();
+        const auto& newname = new_filenames[path.filename().string()];
+        try {
+            std::filesystem::rename(path, path.parent_path() / newname);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << ex.what() << std::endl;
+            exit(EXIT_FAILURE);
+        }
     }
 }
