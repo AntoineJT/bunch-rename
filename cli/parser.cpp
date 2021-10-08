@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include <iostream>
+#include "strutil.hpp"
 
 using namespace std::string_literals;
 
@@ -56,18 +57,6 @@ void Parser::ModelParser::ParseModel()
     m_parsed = true;
 }
 
-bool StartsWith(const std::string_view str, const std::string& begin)
-{
-    const size_t count = begin.length();
-
-    for (size_t i = 0; i < count; ++i) {
-        if (str[i] != begin[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-
 std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(const std::string& str)
 {
     // m_tokens
@@ -80,7 +69,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(co
 
     while (!strv.empty()) {
         if (type == out_type::VAR) {
-            if (!StartsWith(strv, m_tokens[tok_index + 1].str)) {
+            if (!StrUtil::StartsWith(strv, m_tokens[tok_index + 1].str)) {
                 buffer += strv.front();
                 strv.remove_prefix(1);
             }
@@ -93,7 +82,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(co
         }
         else if (type == out_type::TEXT) {
             const auto& curstr = m_tokens[tok_index].str;
-            if (!StartsWith(strv, curstr))
+            if (!StrUtil::StartsWith(strv, curstr))
                 throw "error: provided file name do not match the format"s;
 
             strv.remove_prefix(curstr.length());

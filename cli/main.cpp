@@ -5,6 +5,7 @@
 #include <tclap/CmdLine.h>
 
 #include "parser.hpp"
+#include "strutil.hpp"
 
 auto GetEntries(const std::string_view path,
     const std::function<bool(std::filesystem::directory_entry)>& filter)
@@ -19,19 +20,6 @@ auto GetEntries(const std::string_view path,
         }
     }
     return entries;
-}
-
-bool EndsWith(const std::string& str, const std::string& endstr)
-{
-    const size_t count = endstr.length();
-    const size_t start = str.length() - count;
-
-    for (size_t i = count - 1; i > 0; --i) {
-        if (str[start + i] != endstr[i]) {
-            return false;
-        }
-    }
-    return true;
 }
 
 // can't find a way to do it with templates
@@ -64,7 +52,7 @@ int main(const int argc, const char* argv[])
     const bool confirm = confirmArg.getValue();
 
     const auto filter = [ext](const std::filesystem::directory_entry& entry) {
-        if (ext && !EndsWith(entry.path().filename().string(), ext.value()))
+        if (ext && !StrUtil::EndsWith(entry.path().filename().string(), ext.value()))
             return false;
         return entry.is_regular_file();
     };
