@@ -4,6 +4,8 @@
 #include <optional>
 #include <tclap/CmdLine.h>
 
+#include "parser.hpp"
+
 auto GetEntries(const std::string_view path,
     const std::function<bool(std::filesystem::directory_entry)>& filter)
 -> std::vector<std::filesystem::directory_entry>
