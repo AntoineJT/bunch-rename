@@ -13,6 +13,7 @@ void Parser::ModelParser::ParseModel()
 
     auto state = PARSE_TEXT;
     std::string buffer;
+    int index = 0;
     for (char c : m_fmt) {
         if (c == '{') {
             if (state == PARSE_ID) {
@@ -21,6 +22,8 @@ void Parser::ModelParser::ParseModel()
             else if (state == PARSE_TEXT) {
                 if (buffer != "") {
                     m_tokens.push_back(out_elem{ out_type::TEXT, std::move(buffer) });
+                    m_text_indexes.push_back(index);
+                    ++index;
                     buffer = "";
                 }
                 state = PARSE_ID;
@@ -34,7 +37,9 @@ void Parser::ModelParser::ParseModel()
                 throw "error: invalid format"s;
             }
             else if (state == PARSE_ID) {
-                m_tokens.push_back(out_elem{out_type::VAR, std::move(buffer)});
+                m_tokens.push_back(out_elem{ out_type::VAR, std::move(buffer) });
+                m_var_indexes.push_back(index);
+                ++index;
                 buffer = "";
                 state = PARSE_TEXT;
             }

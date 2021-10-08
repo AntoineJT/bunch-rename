@@ -14,8 +14,10 @@ namespace Parser {
             std::string str; // id name or content
         };
 
-        std::vector<out_elem> m_tokens;
         std::string m_fmt;
+        std::vector<out_elem> m_tokens;
+        std::vector<int> m_var_indexes;
+        std::vector<int> m_text_indexes;
         bool m_parsed = false; // will be used to assert on ConvertTo
 
     public:

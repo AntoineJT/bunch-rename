@@ -76,7 +76,9 @@ int main(const int argc, const char* argv[])
         }
     }
 
-    auto parser = Parser::ModelParser(curfmt);
-    parser.ParseModel();
+    auto oldFormatParser = Parser::ModelParser(curfmt);
+    oldFormatParser.ParseModel();
+    auto newFormatParser = Parser::ModelParser(newfmt);
+    newFormatParser.ParseModel();
     while (1);
 }
