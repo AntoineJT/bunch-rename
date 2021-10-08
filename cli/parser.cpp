@@ -1,11 +1,13 @@
 #include "parser.hpp"
+#include <iostream>
+
+using namespace std::string_literals;
 
 Parser::ModelParser::ModelParser(std::string fmt)
     : m_fmt(std::move(fmt)) {}
 
 void Parser::ModelParser::ParseModel()
 {
-    using namespace std::string_literals;
     enum {
         PARSE_ID, // text under brackets
         PARSE_TEXT
@@ -52,4 +54,62 @@ void Parser::ModelParser::ParseModel()
         }
     }
     m_parsed = true;
+}
+
+bool StartsWith(const std::string_view str, const std::string& begin)
+{
+    const size_t count = begin.length();
+
+    for (size_t i = 0; i < count; ++i) {
+        if (str[i] != begin[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(const std::string& str)
+{
+    // m_tokens
+    size_t tok_index = 0;
+    out_type type = m_tokens[tok_index].type;
+    std::unordered_map<std::string, std::string> map;
+    std::string_view strv = str;
+    std::string_view prev_strv = strv;
+    std::string buffer;
+
+    while (!strv.empty()) {
+        if (type == out_type::VAR) {
+            if (!StartsWith(strv, m_tokens[tok_index + 1].str)) {
+                buffer += strv.front();
+                strv.remove_prefix(1);
+            }
+            else {
+                map.try_emplace(m_tokens[tok_index].str, std::move(buffer));
+                ++tok_index;
+                type = m_tokens[tok_index].type;
+                buffer = "";
+            }
+        }
+        else if (type == out_type::TEXT) {
+            const auto& curstr = m_tokens[tok_index].str;
+            if (!StartsWith(strv, curstr))
+                throw "provided file name do not match the format"s;
+
+            strv.remove_prefix(curstr.length());
+            ++tok_index;
+            type = m_tokens[tok_index].type;
+            prev_strv = strv;
+        }
+    }
+    if (type == out_type::VAR) {
+        map.try_emplace(m_tokens[tok_index].str, prev_strv);
+    }
+    return map;
+}
+
+std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, const std::string& data)
+{
+    return "";
+    // TODO
 }

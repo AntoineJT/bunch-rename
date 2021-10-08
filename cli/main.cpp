@@ -80,5 +80,6 @@ int main(const int argc, const char* argv[])
     oldFormatParser.ParseModel();
     auto newFormatParser = Parser::ModelParser(newfmt);
     newFormatParser.ParseModel();
+    auto data = oldFormatParser.ExtractData("11 - In Pieces");
     while (1);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Parser {
@@ -23,7 +24,7 @@ namespace Parser {
     public:
         explicit ModelParser(std::string fmt);
         void ParseModel();
-        // TODO
-        // std::string ConvertTo(const ModelParser& newfmt, const std::string& data);
+        std::unordered_map<std::string, std::string> ExtractData(const std::string& str);
+        std::string ConvertTo(const ModelParser& newfmt, const std::string& data);
     };
 }
