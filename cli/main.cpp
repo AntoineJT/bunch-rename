@@ -75,4 +75,8 @@ int main(const int argc, const char* argv[])
             std::cout << file.path().filename() << '\n';
         }
     }
+
+    auto parser = Parser::ModelParser(curfmt);
+    parser.ParseModel();
+    while (1);
 }
