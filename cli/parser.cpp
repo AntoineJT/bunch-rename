@@ -94,7 +94,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(co
         else if (type == out_type::TEXT) {
             const auto& curstr = m_tokens[tok_index].str;
             if (!StartsWith(strv, curstr))
-                throw "provided file name do not match the format"s;
+                throw "error: provided file name do not match the format"s;
 
             strv.remove_prefix(curstr.length());
             ++tok_index;
@@ -110,6 +110,18 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(co
 
 std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, const std::string& data)
 {
-    return "";
-    // TODO
+    auto map = ExtractData(data);
+    std::string str;
+    for (const auto& token : newfmt.m_tokens) {
+        if (token.type == out_type::TEXT) {
+            str += token.str;
+        }
+        else if (token.type == out_type::VAR) {
+            str += map[token.str];
+        }
+        else {
+            throw "error: unknown parsing state"s;
+        }
+    }
+    return str;
 }

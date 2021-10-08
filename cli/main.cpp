@@ -80,6 +80,12 @@ int main(const int argc, const char* argv[])
     oldFormatParser.ParseModel();
     auto newFormatParser = Parser::ModelParser(newfmt);
     newFormatParser.ParseModel();
-    auto data = oldFormatParser.ExtractData("11 - In Pieces");
-    while (1);
+
+    for (const auto& file : files) {
+        std::string filename = file.path().filename().string();
+        std::string ext = filename.substr(filename.find_last_of('.'));
+        std::string filenameNoExt = filename.substr(0, filename.length() - ext.length());
+        const std::string newname = oldFormatParser.ConvertTo(newFormatParser, filenameNoExt) + ext;
+        std::cout << newname << '\n';
+    }
 }
