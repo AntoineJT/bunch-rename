@@ -40,12 +40,24 @@ int main(const int argc, const char* argv[])
 {
     TCLAP::CmdLine cmd("Bunch Rename Tool");
     TCLAP::UnlabeledValueArg<std::string> srcdirArg("srcdir", "Source Directory containing files", true, ".", "string");
+    TCLAP::ValueArg<std::string> curfmtArg("", "curfmt", R"(Current file name format
+        Example: curfmt = "{num} - {name}"
+                 newfmt = "Song Artist - Album - {num}. {name}"
+            for
+                "11 - In Pieces"
+            will result in
+                "Song Artist - Album - 11. In Pieces"
+)", true, "", "string");
+    TCLAP::ValueArg<std::string> newfmtArg("", "newfmt", "New file name format\nFor an example, see curfmt help.", true, "", "string");
     TCLAP::ValueArg<std::string> extArg("", "ext", "Keep only files with the specified extension", false, "", "string");
     TCLAP::SwitchArg dryrunArg("", "dry-run", "List selected files only");
-    cmd.add(srcdirArg).add(extArg).add(dryrunArg);
+    cmd.add(srcdirArg).add(curfmtArg).add(newfmtArg)
+        .add(extArg).add(dryrunArg);
     cmd.parse(argc, argv);
 
-    const std::string srcdir = srcdirArg.getValue();
+    const std::string& srcdir = srcdirArg.getValue();
+    const std::string& curfmt = curfmtArg.getValue();
+    const std::string& newfmt = newfmtArg.getValue();
     const auto ext = OPT_ARG(extArg);
     const bool dryrun = dryrunArg.getValue();
 
@@ -54,9 +66,11 @@ int main(const int argc, const char* argv[])
             return false;
         return entry.is_regular_file();
     };
+    auto files = GetEntries(srcdir, filter);
+
     if (dryrun) {
-        for (const auto& entry : GetEntries(srcdir, filter)) {
-            std::cout << entry.path().filename() << '\n';
+        for (const auto& file : files) {
+            std::cout << file.path().filename() << '\n';
         }
     }
 }
