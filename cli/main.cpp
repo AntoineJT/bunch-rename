@@ -58,9 +58,15 @@ int main(const int argc, const char* argv[])
     };
 
     auto oldFormatParser = Parser::ModelParser(curfmt);
-    oldFormatParser.ParseModel();
     auto newFormatParser = Parser::ModelParser(newfmt);
-    newFormatParser.ParseModel();
+    try {
+        oldFormatParser.ParseModel();
+        newFormatParser.ParseModel();
+    }
+    catch (const std::exception& ex) {
+        std::cerr << ex.what() << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     const auto files = GetEntries(srcdir, filter);
     std::unordered_map<std::string, std::string> new_filenames;

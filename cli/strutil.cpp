@@ -1,6 +1,6 @@
 #include "strutil.hpp"
 
-bool StrUtil::StartsWith(const std::string_view str, const std::string& begin)
+bool StrUtil::StartsWith(const std::string_view str, const std::string_view begin)
 {
     const size_t count = begin.length();
 
@@ -12,7 +12,7 @@ bool StrUtil::StartsWith(const std::string_view str, const std::string& begin)
     return true;
 }
 
-bool StrUtil::EndsWith(const std::string_view str, const std::string& endstr)
+bool StrUtil::EndsWith(const std::string_view str, const std::string_view endstr)
 {
     const size_t count = endstr.length();
     const size_t start = str.length() - count;
