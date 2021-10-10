@@ -63,7 +63,7 @@ int main(const int argc, const char* argv[])
         oldFormatParser.ParseModel();
         newFormatParser.ParseModel();
     }
-    catch (const std::exception& ex) {
+    catch (const Parser::ParsingException& ex) {
         std::cerr << ex.what() << std::endl;
         exit(EXIT_FAILURE);
     }

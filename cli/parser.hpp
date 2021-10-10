@@ -1,4 +1,5 @@
 #pragma once
+#include <exception>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -26,5 +27,13 @@ namespace Parser {
         void ParseModel();
         std::unordered_map<std::string, std::string> ExtractData(std::string_view str);
         std::string ConvertTo(const ModelParser& newfmt, std::string_view data);
+    };
+
+    struct ParsingException : private std::exception {
+        explicit ParsingException(std::string reason = "error: error while parsing") : m_reason(std::move(reason)) {}
+        ~ParsingException() noexcept override = default;
+        inline const char* what() const noexcept override { return m_reason.c_str(); }
+    private:
+        std::string m_reason;
     };
 }

@@ -20,7 +20,7 @@ void Parser::ModelParser::ParseModel()
     for (char c : m_fmt) {
         if (c == '{') {
             if (state == PARSE_ID) {
-                throw std::runtime_error("error: invalid format");
+                throw ParsingException("error: invalid format");
             }
             else if (state == PARSE_TEXT) {
                 if (buffer != "") {
@@ -32,12 +32,12 @@ void Parser::ModelParser::ParseModel()
                 state = PARSE_ID;
             }
             else {
-                throw std::runtime_error("error: unknown parsing state");
+                throw ParsingException("error: unknown parsing state");
             }
         }
         else if (c == '}') {
             if (state == PARSE_TEXT) {
-                throw std::runtime_error("error: invalid format");
+                throw ParsingException("error: invalid format");
             }
             else if (state == PARSE_ID) {
                 m_tokens.push_back(out_elem{ out_type::VAR, std::move(buffer) });
@@ -47,7 +47,7 @@ void Parser::ModelParser::ParseModel()
                 state = PARSE_TEXT;
             }
             else {
-                throw std::runtime_error("error: unknown parsing state");
+                throw ParsingException("error: unknown parsing state");
             }
         }
         else {
@@ -81,7 +81,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
         else if (type == out_type::TEXT) {
             const auto& curstr = m_tokens[tok_index].str;
             if (!StrUtil::StartsWith(strv, curstr))
-                throw std::runtime_error("error: provided file name do not match the format");
+                throw ParsingException("error: provided file name do not match the format");
 
             strv.remove_prefix(curstr.length());
             ++tok_index;
@@ -109,7 +109,7 @@ std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, std::strin
             str += map[token.str];
         }
         else {
-            throw std::runtime_error("error: unknown parsing state");
+            throw ParsingException("error: unknown parsing state");
         }
     }
     return str;
