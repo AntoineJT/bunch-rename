@@ -97,7 +97,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
 
 std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, std::string_view data)
 {
-    assert(!m_parsed || !newfmt.m_parsed);
+    assert(m_parsed && newfmt.m_parsed);
 
     auto map = ExtractData(data);
     std::string str;

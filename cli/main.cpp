@@ -45,20 +45,15 @@ int main(const int argc, const char* argv[])
         .add(extArg).add(confirmArg);
     cmd.parse(argc, argv);
 
-    const std::string& srcdir = srcdirArg.getValue();
-    const std::string& curfmt = curfmtArg.getValue();
-    const std::string& newfmt = newfmtArg.getValue();
     const auto ext = OPT_ARG(extArg);
-    const bool confirm = confirmArg.getValue();
-
     const auto filter = [ext](const std::filesystem::directory_entry& entry) {
         if (ext && !StrUtil::EndsWith(entry.path().filename().string(), ext.value()))
             return false;
         return entry.is_regular_file();
     };
 
-    auto oldFormatParser = Parser::ModelParser(curfmt);
-    auto newFormatParser = Parser::ModelParser(newfmt);
+    auto oldFormatParser = Parser::ModelParser(curfmtArg.getValue());
+    auto newFormatParser = Parser::ModelParser(newfmtArg.getValue());
     try {
         oldFormatParser.ParseModel();
         newFormatParser.ParseModel();
@@ -68,7 +63,7 @@ int main(const int argc, const char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    const auto files = GetEntries(srcdir, filter);
+    const auto files = GetEntries(srcdirArg.getValue(), filter);
     std::unordered_map<std::string, std::string> new_filenames;
 
     for (const auto& file : files) {
@@ -82,7 +77,7 @@ int main(const int argc, const char* argv[])
     }
     std::cout << std::flush;
 
-    if (!confirm) {
+    if (!confirmArg.getValue()) {
         std::cout << "Are you sure to rename all those files? [Y/N] ";
         char c;
         std::cin >> c;
