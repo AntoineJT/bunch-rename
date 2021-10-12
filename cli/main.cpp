@@ -7,14 +7,11 @@
 #include "parser.hpp"
 #include "strutil.hpp"
 
-auto GetEntries(const std::string_view path,
-    const std::function<bool(std::filesystem::directory_entry)>& filter)
--> std::vector<std::filesystem::directory_entry>
+auto GetEntries(const std::filesystem::path& path,
+    const std::function<bool(const std::filesystem::directory_entry&)>& filter)
 {
-    namespace fs = std::filesystem;
-
-    std::vector<fs::directory_entry> entries;
-    for (const auto& entry : fs::directory_iterator(path)) {
+    std::vector<std::filesystem::directory_entry> entries;
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (filter(entry)) {
             entries.push_back(entry);
         }
@@ -63,11 +60,22 @@ int main(const int argc, const char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    const auto files = GetEntries(srcdirArg.getValue(), filter);
+    auto srcdir = std::filesystem::absolute(srcdirArg.getValue());
+    if (!std::filesystem::exists(srcdir)) {
+        std::cerr << "error: this folder does not exists!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    if (!std::filesystem::is_directory(srcdir)) {
+        std::cerr << "error: provided path is not a directory!" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    const auto files = GetEntries(srcdir, filter);
     std::unordered_map<std::string, std::string> new_filenames;
 
     for (const auto& file : files) {
         std::string filename = file.path().filename().string();
+        // caution if no extension
         std::string fileext = filename.substr(filename.find_last_of('.'));
         std::string filenameNoExt = filename.substr(0, filename.length() - fileext.length());
 
