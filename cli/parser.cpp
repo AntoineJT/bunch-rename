@@ -62,11 +62,14 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
     size_t tok_index = 0;
     out_type type = m_tokens[tok_index].type;
     std::unordered_map<std::string, std::string> map;
-    std::string_view prev_strv = strv;
     std::string buffer;
 
-    while (!strv.empty() && tok_index + 1 < m_tokens.size()) {
+    while (!strv.empty()) {
         if (type == out_type::VAR) {
+            if (tok_index + 1 < m_tokens.size()) {
+                map.try_emplace(m_tokens[tok_index].str, strv);
+                break;
+            }
             // relies on type alternance (var to
             // text and the opposite) to work
             if (!StrUtil::StartsWith(strv, m_tokens[tok_index + 1].str)) {
@@ -88,11 +91,7 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
             strv.remove_prefix(curstr.length());
             ++tok_index;
             type = m_tokens[tok_index].type;
-            prev_strv = strv;
         }
-    }
-    if (type == out_type::VAR) {
-        map.try_emplace(m_tokens[tok_index].str, prev_strv);
     }
     return map;
 }
