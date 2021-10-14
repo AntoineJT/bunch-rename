@@ -96,6 +96,21 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
     return map;
 }
 
+bool Parser::ModelParser::Matches(std::string_view strv)
+{
+    // less effective than duplicating the
+    // ExtractData code here while removing
+    // unneeded operations as using a map
+    // but much more maintainable
+    try {
+        ExtractData(strv);
+    }
+    catch (const ParsingException&) {
+        return false;
+    }
+    return true;
+}
+
 std::string Parser::ModelParser::ConvertTo(const ModelParser& newfmt, std::string_view data)
 {
     assert(m_parsed && newfmt.m_parsed);
