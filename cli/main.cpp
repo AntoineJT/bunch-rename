@@ -49,14 +49,16 @@ int main(const int argc, const char* argv[])
     // for some reason decltype(files) does not work as I want
     std::vector<std::filesystem::directory_entry> files;
 
-    // filters files
+    // filter files
     for (const auto& file : std::filesystem::directory_iterator(srcdir)) {
+        // ignore directories, symlink, etc.
         if (!file.is_regular_file()) {
             continue;
         }
 
         std::string filename = file.path().filename().string();
         std::string newname;
+        // get new names of matching files, ignore others
         try {
             newname = oldFormatParser.ConvertTo(newFormatParser, filename);
         }
@@ -84,6 +86,7 @@ int main(const int argc, const char* argv[])
         }
     }
 
+    // rename matching files
     for (const auto& file : files) {
         const auto& path = file.path();
         const auto& newname = new_filenames[path.filename().string()];
