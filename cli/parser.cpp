@@ -85,13 +85,17 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
         }
         else if (type == out_type::TEXT) {
             const auto& curstr = m_tokens[tok_index].str;
-            if (!StrUtil::StartsWith(strv, curstr))
-                throw ParsingException("error: provided file name do not match the format");
+            if (!StrUtil::StartsWith(strv, curstr)) {
+                throw ParsingException("error: provided file name does not match the format");
+            }
 
             strv.remove_prefix(curstr.length());
             ++tok_index;
             type = m_tokens[tok_index].type;
         }
+    }
+    if (tok_index + 1 < m_tokens.size()) {
+        throw ParsingException("error: provided file name does not match the format");
     }
     return map;
 }
