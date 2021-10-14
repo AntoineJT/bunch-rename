@@ -7,10 +7,6 @@
 #include "parser.hpp"
 #include "strutil.hpp"
 
-// can't find a way to do it with templates
-// as TCLAP::Arg type does not have getValue
-// #define OPT_ARG(x) x.isSet() ? std::optional(x.getValue()) : std::nullopt
-
 int main(const int argc, const char* argv[])
 {
     TCLAP::CmdLine cmd("Bunch Rename Tool");
