@@ -27,7 +27,6 @@ namespace Parser {
         void ParseModel();
         std::unordered_map<std::string, std::string> ExtractData(std::string_view strv);
         std::string ConvertTo(const ModelParser& newfmt, std::string_view data);
-        bool Matches(std::string_view strv);
     };
 
     struct ParsingException : private std::exception {
