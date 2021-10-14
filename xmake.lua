@@ -7,6 +7,9 @@ add_rules("mode.debug", "mode.release")
 set_languages("cxx17")
 set_symbols("debug", "edit")
 
+if is_plat("linux") or is_plat("mingw") then
+    add_links("stdc++fs")
+end
 add_requires("tclap 1.4.0-rc1") -- latest version at the time
 
 if is_mode("release") then

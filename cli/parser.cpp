@@ -23,7 +23,7 @@ void Parser::ModelParser::ParseModel()
                 throw ParsingException("error: invalid format");
             }
             else if (state == PARSE_TEXT) {
-                if (buffer != "") {
+                if (!buffer.empty()) {
                     m_tokens.push_back(out_elem{ out_type::TEXT, std::move(buffer) });
                     m_text_indexes.push_back(index);
                     ++index;
@@ -54,6 +54,10 @@ void Parser::ModelParser::ParseModel()
             buffer += c;
         }
     }
+    if (state == PARSE_TEXT && !buffer.empty()) {
+        m_tokens.push_back(out_elem{ out_type::TEXT, std::move(buffer) });
+        m_text_indexes.push_back(index);
+    }
     m_parsed = true;
 }
 
@@ -64,10 +68,13 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
     std::unordered_map<std::string, std::string> map;
     std::string buffer;
 
-    while (!strv.empty()) {
+    while (!strv.empty() && tok_index < m_tokens.size()) {
         if (type == out_type::VAR) {
-            if (tok_index + 1 == m_tokens.size()) {
+            if (tok_index == m_tokens.size() - 1) {
+                const auto& str = m_tokens[tok_index].str;
                 map.try_emplace(m_tokens[tok_index].str, strv);
+                ++tok_index;
+                strv.remove_prefix(str.size());
                 break;
             }
             // relies on type alternance (var to
@@ -85,13 +92,17 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
         }
         else if (type == out_type::TEXT) {
             const auto& curstr = m_tokens[tok_index].str;
-            if (!StrUtil::StartsWith(strv, curstr))
-                throw ParsingException("error: provided file name do not match the format");
+            if (!StrUtil::StartsWith(strv, curstr)) {
+                throw ParsingException("error: provided file name does not match the format");
+            }
 
             strv.remove_prefix(curstr.length());
             ++tok_index;
             type = m_tokens[tok_index].type;
         }
+    }
+    if (tok_index < m_tokens.size() || !strv.empty()) {
+        throw ParsingException("error: provided file name does not match the format");
     }
     return map;
 }
