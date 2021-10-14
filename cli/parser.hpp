@@ -25,7 +25,7 @@ namespace Parser {
     public:
         explicit ModelParser(std::string fmt);
         void ParseModel();
-        std::unordered_map<std::string, std::string> ExtractData(std::string_view str);
+        std::unordered_map<std::string, std::string> ExtractData(std::string_view strv);
         std::string ConvertTo(const ModelParser& newfmt, std::string_view data);
     };
 

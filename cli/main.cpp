@@ -72,6 +72,9 @@ int main(const int argc, const char* argv[])
 
     const auto files = GetEntries(srcdir, filter);
     std::unordered_map<std::string, std::string> new_filenames;
+    // for some reason decltype(files) does not work as I want
+    std::vector<std::filesystem::directory_entry> filteredfiles;
+    filteredfiles.reserve(files.size());
 
     for (const auto& file : files) {
         std::string filename = file.path().filename().string();
@@ -79,22 +82,36 @@ int main(const int argc, const char* argv[])
         std::string fileext = filename.substr(filename.find_last_of('.'));
         std::string filenameNoExt = filename.substr(0, filename.length() - fileext.length());
 
-        std::string newname = oldFormatParser.ConvertTo(newFormatParser, filenameNoExt) + fileext;
+        std::string newnameNoExt;
+        try {
+            newnameNoExt = oldFormatParser.ConvertTo(newFormatParser, filenameNoExt);
+        }
+        catch (const Parser::ParsingException&) {
+            continue;
+        }
+        filteredfiles.push_back(file);
+
+        std::string newname = newnameNoExt + fileext;
         std::cout << filename << "\n> " << newname << '\n';
         new_filenames.try_emplace(std::move(filename), std::move(newname));
     }
     std::cout << std::flush;
+
+    if (filteredfiles.empty()) {
+        std::cerr << "No file matched your pattern! (curfmt)" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     if (!confirmArg.getValue()) {
         std::cout << "Are you sure to rename all those files? [Y/N] ";
         char c;
         std::cin >> c;
         if (c != 'y' && c != 'Y') {
-            exit(EXIT_SUCCESS);
+            return EXIT_SUCCESS;
         }
     }
 
-    for (const auto& file : files) {
+    for (const auto& file : filteredfiles) {
         const auto& path = file.path();
         const auto& newname = new_filenames[path.filename().string()];
         try {
@@ -102,7 +119,7 @@ int main(const int argc, const char* argv[])
         }
         catch (const std::exception& ex) {
             std::cerr << ex.what() << std::endl;
-            exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
     }
 }
