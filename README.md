@@ -1,6 +1,8 @@
 # Bunch rename
 A cli tool to change file name format
 
+[![Windows](https://github.com/AntoineJT/bunch-rename/actions/workflows/windows.yml/badge.svg)](https://github.com/AntoineJT/bunch-rename/actions/workflows/windows.yml)
+
 ![Demo](.images/demo.gif)
 
 ## Why does this exists?

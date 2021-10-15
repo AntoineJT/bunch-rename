@@ -1,0 +1,70 @@
+name: Linux
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout
+      
+    - uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: latest
+      name: Install xmake
+
+    - name: Build debug (x86)
+      run: |
+        xmake f -m debug -a x86 -y
+        xmake
+    - name: Build debug (x64)
+      run: |
+        xmake f -m debug -a x64 -y
+        xmake
+    - name: Build release (x86)
+      run: | 
+        xmake f -m release -a x86 -y
+        xmake
+    - name: Build release (x64)
+      run: | 
+        xmake f -m release -a x64 -y
+        xmake
+    
+    - name: Prepare artifacts
+      run: |
+        mkdir debug-x86-artifact
+        move build/linux/x86/debug/brn debug-x86-artifact/
+        
+        mkdir debug-x64-artifact
+        move build/linux/x64/debug/brn debug-x64-artifact/
+
+        mkdir release-x86-artifact
+        move build/linux/x86/release/brn release-x86-artifact/
+        
+        mkdir release-x64-artifact
+        move build/linux/x64/release/brn release-x64-artifact/
+    - uses: actions/upload-artifact@v2
+      with:
+        name: brn-linux-debug-x86-${{ github.run_id }}
+        path: debug-x86-artifact/
+      name: Upload debug x86 artifact
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: brn-linux-debug-x64-${{ github.run_id }}
+        path: debug-x64-artifact/
+      name: Upload debug x64 artifact
+      
+    - uses: actions/upload-artifact@v2
+      with:
+        name: brn-linux-release-x86-${{ github.run_id }}
+        path: release-x86-artifact/
+      name: Upload release x86 artifact
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: brn-linux-release-x64-${{ github.run_id }}
+        path: release-x64-artifact/
+      name: Upload release x64 artifact
