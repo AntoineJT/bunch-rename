@@ -4,5 +4,7 @@
 
 namespace StrUtil {
     bool StartsWith(const std::string_view str, const std::string_view begin);
+#if 0
     bool EndsWith(const std::string_view str, const std::string_view endstr);
+#endif
 }

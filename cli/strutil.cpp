@@ -12,6 +12,7 @@ bool StrUtil::StartsWith(const std::string_view str, const std::string_view begi
     return true;
 }
 
+#if 0
 bool StrUtil::EndsWith(const std::string_view str, const std::string_view endstr)
 {
     const size_t count = endstr.length();
@@ -29,3 +30,4 @@ bool StrUtil::EndsWith(const std::string_view str, const std::string_view endstr
     }
     return true;
 }
+#endif
