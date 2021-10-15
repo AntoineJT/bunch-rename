@@ -1,10 +1,10 @@
-name: Windows
+name: Linux
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -19,17 +19,14 @@ jobs:
       run: |
         xmake f -m debug -a x86 -y
         xmake
-
     - name: Build debug (x64)
       run: |
         xmake f -m debug -a x64 -y
         xmake
-
     - name: Build release (x86)
       run: | 
         xmake f -m release -a x86 -y
         xmake
-
     - name: Build release (x64)
       run: | 
         xmake f -m release -a x64 -y
@@ -38,39 +35,36 @@ jobs:
     - name: Prepare artifacts
       run: |
         mkdir debug-x86-artifact
-        move build/windows/x86/debug/brn.exe debug-x86-artifact/
-        move build/windows/x86/debug/brn.pdb debug-x86-artifact/
+        move build/linux/x86/debug/brn debug-x86-artifact/
         
         mkdir debug-x64-artifact
-        move build/windows/x64/debug/brn.exe debug-x64-artifact/
-        move build/windows/x64/debug/brn.pdb debug-x64-artifact/
+        move build/linux/x64/debug/brn debug-x64-artifact/
 
         mkdir release-x86-artifact
-        move build/windows/x86/release/brn.exe release-x86-artifact/
+        move build/linux/x86/release/brn release-x86-artifact/
         
         mkdir release-x64-artifact
-        move build/windows/x64/release/brn.exe release-x64-artifact/
-
+        move build/linux/x64/release/brn release-x64-artifact/
     - uses: actions/upload-artifact@v2
       with:
-        name: brn-windows-debug-x86-${{ github.run_id }}
+        name: brn-linux-debug-x86-${{ github.run_id }}
         path: debug-x86-artifact/
       name: Upload debug x86 artifact
 
     - uses: actions/upload-artifact@v2
       with:
-        name: brn-windows-debug-x64-${{ github.run_id }}
+        name: brn-linux-debug-x64-${{ github.run_id }}
         path: debug-x64-artifact/
       name: Upload debug x64 artifact
       
     - uses: actions/upload-artifact@v2
       with:
-        name: brn-windows-release-x86-${{ github.run_id }}
+        name: brn-linux-release-x86-${{ github.run_id }}
         path: release-x86-artifact/
       name: Upload release x86 artifact
 
     - uses: actions/upload-artifact@v2
       with:
-        name: brn-windows-release-x64-${{ github.run_id }}
+        name: brn-linux-release-x64-${{ github.run_id }}
         path: release-x64-artifact/
       name: Upload release x64 artifact
