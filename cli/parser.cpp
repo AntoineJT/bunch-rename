@@ -71,10 +71,9 @@ std::unordered_map<std::string, std::string> Parser::ModelParser::ExtractData(st
     while (!strv.empty() && tok_index < m_tokens.size()) {
         if (type == out_type::VAR) {
             if (tok_index == m_tokens.size() - 1) {
-                const auto& str = m_tokens[tok_index].str;
                 map.try_emplace(m_tokens[tok_index].str, strv);
                 ++tok_index;
-                strv.remove_prefix(str.size());
+                strv.remove_prefix(strv.size());
                 break;
             }
             // relies on type alternance (var to
