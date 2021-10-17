@@ -42,6 +42,12 @@ int main()
     t_assert(ConvertToFails("{year} - {name}.txt", "{year}. {name}.log", 
         "2021. test.txt"));
 
+    // TEXT - VAR
+    t_assert(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
+        "Linkin Park - Minutes to Midnight - 11. In Pieces.mp3") == "11 - In Pieces.mp3");
+    t_assert(ConvertToFails("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
+        "Linkin Park - Minutes to Midnight - 11 - In Pieces.mp3"));
+
     // TEXT - TEXT
     t_assert(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}.mp3", "{num} - {name}.mp3",
         "Linkin Park - Minutes to Midnight - 11. In Pieces.mp3") == "11 - In Pieces.mp3");
