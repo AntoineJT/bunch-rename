@@ -1,3 +1,5 @@
+set_xmakever("2.5.6")
+
 set_project("bunch_rename")
 set_version("0.0.0")
 
@@ -7,10 +9,11 @@ add_rules("mode.debug", "mode.release")
 set_languages("cxx17")
 set_symbols("debug", "edit")
 
+add_requires("tclap 1.4.0-rc1") -- latest version at the time
+
 if is_plat("linux") or is_plat("mingw") then
     add_links("stdc++fs")
 end
-add_requires("tclap 1.4.0-rc1") -- latest version at the time
 
 if is_mode("release") then
     set_optimize("fastest")
@@ -21,6 +24,23 @@ target("cli")
     set_basename("brn")
 
     add_files("cli/**.cpp")
-    add_headerfiles("cli/**.hpp")
+    -- add_headerfiles("cli/**.hpp")
 
     add_packages("tclap")
+    add_deps("lib")
+
+target("lib")
+    set_kind("static")
+    
+    add_files("lib/src/**.cpp")
+    add_headerfiles("lib/include/**.hpp")
+    add_headerfiles("lib/src/**.hpp")
+    add_includedirs("lib/include/", {public = true})
+
+target("lib_tests")
+    set_kind("binary")
+
+    add_files("lib/tests/**.cpp")
+    add_headerfiles("lib/tests/**.hpp")
+
+    add_deps("lib")
