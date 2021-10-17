@@ -20,21 +20,33 @@ jobs:
         xmake f -m debug -a x86 -y
         xmake
 
+    - name: Run tests
+      run: xmake run lib_tests
+
     - name: Build debug (x64)
       run: |
         xmake f -m debug -a x64 -y
         xmake
+
+    - name: Run tests
+      run: xmake run lib_tests
 
     - name: Build release (x86)
       run: | 
         xmake f -m release -a x86 -y
         xmake
 
+    - name: Run tests
+      run: xmake run lib_tests
+
     - name: Build release (x64)
       run: | 
         xmake f -m release -a x64 -y
         xmake
-    
+
+    - name: Run tests
+      run: xmake run lib_tests
+
     - name: Prepare artifacts
       run: |
         mkdir debug-x86-artifact
