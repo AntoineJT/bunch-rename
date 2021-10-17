@@ -1,9 +1,14 @@
 #include <iostream>
 #include "lib/parser.hpp"
+#include "lib/strutil.hpp"
 
-void t_assert(const bool cond)
+#define T_ASSERT(cond) t_assert((cond), #cond, __LINE__)
+
+void t_assert(const bool b_cond, const char* cond, const int line)
 {
-    if (!cond) {
+    if (!b_cond) {
+        std::cerr << "assertion failed at line " << line << ": "
+            << "\n\t" << cond << std::endl;
         exit(EXIT_FAILURE);
     }
 }
@@ -28,30 +33,46 @@ bool ConvertToFails(const std::string& fmt, const std::string& newfmt, std::stri
     }
 }
 
-int main()
+inline void TestParser()
 {
     // VAR - VAR
-    t_assert(ConvertTo("{num} - {name}", "{num}. {name}", 
+    T_ASSERT(ConvertTo("{num} - {name}", "{num}. {name}",
         "11 - In Pieces.mp3") == "11. In Pieces.mp3");
-    t_assert(ConvertToFails("{num} - {name}", "{num}. {name}", 
+    T_ASSERT(ConvertToFails("{num} - {name}", "{num}. {name}",
         "11. In Pieces.mp3"));
 
     // VAR - TEXT
-    t_assert(ConvertTo("{year} - {name}.txt", "{year}. {name}.log", 
+    T_ASSERT(ConvertTo("{year} - {name}.txt", "{year}. {name}.log",
         "2021 - test.txt") == "2021. test.log");
-    t_assert(ConvertToFails("{year} - {name}.txt", "{year}. {name}.log", 
+    T_ASSERT(ConvertToFails("{year} - {name}.txt", "{year}. {name}.log",
         "2021. test.txt"));
 
     // TEXT - VAR
-    t_assert(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
+    T_ASSERT(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
         "Linkin Park - Minutes to Midnight - 11. In Pieces.mp3") == "11 - In Pieces.mp3");
-    t_assert(ConvertToFails("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
+    T_ASSERT(ConvertToFails("Linkin Park - Minutes to Midnight - {num}. {name}", "{num} - {name}",
         "Linkin Park - Minutes to Midnight - 11 - In Pieces.mp3"));
 
     // TEXT - TEXT
-    t_assert(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}.mp3", "{num} - {name}.mp3",
+    T_ASSERT(ConvertTo("Linkin Park - Minutes to Midnight - {num}. {name}.mp3", "{num} - {name}.mp3",
         "Linkin Park - Minutes to Midnight - 11. In Pieces.mp3") == "11 - In Pieces.mp3");
-    t_assert(ConvertToFails("Linkin Park - Minutes to Midnight - {num}. {name}.mp3", "{num} - {name}.mp3",
+    T_ASSERT(ConvertToFails("Linkin Park - Minutes to Midnight - {num}. {name}.mp3", "{num} - {name}.mp3",
         "Linkin Park - Minutes to Midnight - 11 - In Pieces.mp3"));
+}
+
+inline void TestStrUtil()
+{
+    // StartsWith
+    T_ASSERT(StrUtil::StartsWith("This is a unit test!", "This"));
+    T_ASSERT(!StrUtil::StartsWith("This is a unit test!", "this"));
+    T_ASSERT(StrUtil::StartsWith("", ""));
+    T_ASSERT(!StrUtil::StartsWith("", "test"));
+    T_ASSERT(StrUtil::StartsWith("test", ""));
+}
+
+int main()
+{
+    TestParser();
+    TestStrUtil();
     return EXIT_SUCCESS;
 }
