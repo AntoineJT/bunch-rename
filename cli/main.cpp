@@ -4,8 +4,8 @@
 #include <optional>
 #include <tclap/CmdLine.h>
 
-#include "parser.hpp"
-#include "strutil.hpp"
+#include "lib/parser.hpp"
+#include "lib/strutil.hpp"
 
 int main(const int argc, const char* argv[])
 {

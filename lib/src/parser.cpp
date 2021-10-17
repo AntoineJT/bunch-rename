@@ -1,7 +1,7 @@
-#include "parser.hpp"
+#include "lib/parser.hpp"
 #include <cassert>
 #include <iostream>
-#include "strutil.hpp"
+#include "lib/strutil.hpp"
 
 Parser::ModelParser::ModelParser(std::string fmt)
     : m_fmt(std::move(fmt)) {}

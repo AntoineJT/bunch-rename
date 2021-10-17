@@ -32,11 +32,15 @@ target("cli")
 target("lib")
     set_kind("static")
     
-    add_files("lib/**.cpp")
-    add_headerfiles("lib/**.hpp")
+    add_files("lib/src/**.cpp")
+    add_headerfiles("lib/include/**.hpp")
+    add_headerfiles("lib/src/**.hpp")
     add_includedirs("lib/include/", {public = true})
 
---[[
-target("cli_tests")
+target("lib_tests")
     set_kind("binary")
-]]
+
+    add_files("lib/tests/**.cpp")
+    add_headerfiles("lib/tests/**.hpp")
+
+    add_deps("lib")
